@@ -21,14 +21,11 @@ function getExtensionMirrordPath(): Uri {
  * Tries to find local mirrord in path or in extension storage.
  */
 export async function getLocalMirrordBinary(version?: string): Promise<string | null> {
-  console.log(`version is ${version}`);
   try {
     const mirrordPath = await which("mirrord");
-    console.log(`mirrordPath is ${mirrordPath}`);
     if (version) {
       const api = new MirrordAPI(mirrordPath);
       const installedVersion = await api.getBinaryVersion();
-      console.log(`installedVersion is ${installedVersion}`);
       if (installedVersion === version) {
         return mirrordPath;
       }
@@ -38,6 +35,7 @@ export async function getLocalMirrordBinary(version?: string): Promise<string | 
   } catch (e) {
     console.debug("couldn't find mirrord in path");
   }
+
   try {
     const mirrordPath = getExtensionMirrordPath();
     await workspace.fs.stat(mirrordPath);
@@ -50,9 +48,8 @@ export async function getLocalMirrordBinary(version?: string): Promise<string | 
     } else {
       return mirrordPath.fsPath;
     }
-
   } catch (e) {
-    console.log("couldn't find mirrord in extension storage");
+    console.error("couldn't find mirrord in extension storage");
   }
   return null;
 }
@@ -106,7 +103,6 @@ export async function getMirrordBinary(): Promise<string> {
 
   // TODO(alex): Why do we first check if installed, then check remote? If we always check remote anyway, why not just check the remote first, and local once?
   let localMirrord = await getLocalMirrordBinary();
-  console.log(`found mirrord ${localMirrord}`);
   // const latestVersion = await getLatestSupportedVersion();
 
   // See if maybe we have it installed already, in correct version.
@@ -130,14 +126,6 @@ export async function getMirrordBinary(): Promise<string> {
  * @returns The latest supported version of mirrord for current extension version
  */
 async function getLatestSupportedVersion(): Promise<string> {
-  // commented out logic to avoid checking every X seconds
-  // uncomment if hits performance or too annoying
-  // let lastChecked = globalContext.globalState.get('binaryLastChecked', 0);
-  // let lastBinaryVersion = globalContext.globalState.get('lastBinaryVersion', '');
-
-  // if (lastBinaryVersion && lastChecked > Date.now() - binaryCheckInterval) {
-  //     return lastBinaryVersion;
-  // }
   let version;
   // send test for test runs
   if ((globalContext.extensionMode === ExtensionMode.Development) || (process.env.CI_BUILD_PLUGIN === "true")) {
@@ -149,8 +137,6 @@ async function getLatestSupportedVersion(): Promise<string> {
     "params": { "source": 1, "version": version, "platform": platform() },
     timeout: 2000,
   });
-
-  console.log(`getting latest supported version ${response.data}`);
 
   // globalContext.globalState.update('binaryLastChecked', Date.now());
   // globalContext.globalState.update('lastBinaryVersion', response.data);

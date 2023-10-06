@@ -145,10 +145,6 @@ export class MirrordAPI {
 
   // Return environment for the spawned mirrord cli processes.
   private static getEnv(configEnv: EnvVars): NodeJS.ProcessEnv {
-    console.log(`env for this process ${JSON.stringify(process.env)}`);
-    console.log(`config env ended up as ${JSON.stringify(configEnv)}`);
-    // const f = Object.fromEntries(configEnv);
-
     // clone env vars and add MIRRORD_PROGRESS_MODE
     return {
       // eslint-disable-next-line @typescript-eslint/naming-convention
