@@ -124,12 +124,14 @@ async function main(
 
 	let mirrordApi = new MirrordAPI(cliPath);
 
-	config.env ||= {};
+	console.log(`config.env ${JSON.stringify(config.env)}`);
+	console.log(`config.env initialized? ${JSON.stringify(config.env)}`);
 	let target = null;
 
 	let configPath = await MirrordConfigManager.getInstance().resolveMirrordConfig(folder, config);
-	const verifiedConfig = await mirrordApi.verifyConfig(configPath);
+	const verifiedConfig = await mirrordApi.verifyConfig(configPath, config.env);
 
+	console.log(`verifiedConfig is ${JSON.stringify(verifiedConfig)}`);
 	// If target wasn't specified in the config file (or there's no config file), let user choose pod from dropdown
 	if (!configPath || (verifiedConfig && !isTargetSet(verifiedConfig))) {
 		let targets;
